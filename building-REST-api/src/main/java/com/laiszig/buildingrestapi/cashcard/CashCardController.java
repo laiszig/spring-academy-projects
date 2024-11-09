@@ -11,8 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 class CashCardController {
 
     @GetMapping("/{requestedId}") // Handler method. Requests that match cashcards/{requestedID} will be handled by this method
-    public ResponseEntity<String> findById() {
-        return ResponseEntity.ok("{}");
+    public ResponseEntity<CashCard> findById(@PathVariable Long requestedId) {
+        //@PathVariable makes Spring Web aware of the requestedId supplied in the HTTP request and available for us to use in our handler method.
+        if (requestedId.equals(99L)) {
+            CashCard cashCard = new CashCard(99L, 123.45);
+            return ResponseEntity.ok(cashCard);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-
 }
