@@ -68,7 +68,7 @@ The software industry has adopted several patterns for capturing agreed-upon API
 We define an API contract as a formal agreement between a software provider and a consumer that abstractly communicates how to interact with each other. This contract defines how API providers and consumers interact, what data exchanges looks like, and how to communicate success and failure cases.
 
 The provider and consumers do not have to share the same programming language, only the same API contracts. For this project, there's one contract between the Cash Card service and all services using it. Below is an example of that first API contract.
-```json lines
+```text
    Request
        URI: /cashcards/{id}
        HTTP Verb: GET
@@ -197,7 +197,7 @@ When building REST APIs, each CRUD operation has a designated **HTTP method** an
 
 ---
 
-# 📩 The Request Body
+# 📥 The Request Body
 
 When following **REST** conventions for **CREATE** or **UPDATE** operations, we need to submit data to the **API** through the request body. This **request body** contains the data necessary to either create or update a resource.
 
@@ -211,7 +211,7 @@ For a **READ** operation, the **URI (endpoint)** path format is `/cashcards/{id}
 
 - **GET requests**: The body of a GET request remains empty.
 
-```json lines
+```text
 Request:
   Method: GET
   URL: http://cashcard.example.com/cashcards/123
@@ -219,14 +219,14 @@ Request:
 ```
 
 The response to a successful Read request has a body containing the JSON representation of the requested Resource, with a Response Status Code of 200 (OK). Therefore, the response to the above Read request would look like this:
-```json lines
-Response:
-   Status Code: 200
-   Body:
-   {
-   "id": 123,
-   "amount": 25.00
+```json
+{
+   "Request": {
+      "Method": "GET",
+      "URL": "http://cashcard.example.com/cashcards/123",
+      "Body": ""
    }
+}
 ```
 ---
 
@@ -301,4 +301,147 @@ class CashCardController {
       return ResponseEntity.ok(cashCard);
    }
 }
+```
+
+---
+
+# 📦 Repositories & Spring Data
+
+If we to return real data, from a database, Spring Data works with Spring Boot to make database integration simple.
+
+## 🏗 Controller-Repository Architecture
+
+The **Separation of Concerns** principle states that well-designed software should be modular, with each module having distinct and separate concerns from any other module.
+
+If we have hard-coded response from the Controller, this setup violates the Separation of Concerns principle by mixing the concerns of a Controller, which is an abstraction of a web interface, with the concerns of reading and writing data to a data store, such as a database. 
+- To avoid this we use a common software architecture pattern to enforce data management separation via the Repository pattern.
+
+A common architectural framework that divides these layers, typically by function or value, such as business, data, and presentation layers, is called **Layered Architecture**. 
+- The Repository and Controller are two layers in a Layered Architecture. 
+  - The Controller is in a layer near the Client (as it receives and responds to web requests) while the Repository is in a layer near the data store (as it reads from and writes to the data store).
+  - There may be intermediate layers as well, as dictated by business needs. We don't need any additional layers, at least not yet!
+
+The Repository is the interface between the application and the database, and provides a common abstraction for any database, making it easier to switch to a different database when needed.
+![](.README_images/cd1e29e4.png)
+
+Spring Data provides a collection of robust data management tools, including implementations of the Repository pattern.
+
+## 💾 Choosing a Database
+
+In this project we use an **embedded, in-memory database**. 
+- “Embedded” simply means that it’s a Java library, so it can be added to the project just like any other dependency.
+- “In-memory” means that it stores data in memory only, as opposed to persisting data in permanent, durable storage. 
+- At the same time, our in-memory database is largely compatible with production-grade relational database management systems (RDBMS) like MySQL, SQL Server, and many others. Specifically, it uses JDBC (the standard Java library for database connectivity) and SQL (the standard database query language).
+![](.README_images/b555a3ab.png)
+- 
+### 🔄 In Memory Embedded vs External Database
+
+There are tradeoffs to using an in-memory database instead of a persistent database. 
+- On one hand, in-memory allows you to develop without installing a separate RDBMS, and ensures that the database is in the same state (i.e., empty) on every test run.
+- However, you do need a persistent database for the live "production" application. This leads to a **Dev-Prod Parity** mismatch: Your application might behave differently when running the in-memory database than when running in production.
+
+This project uses H2, it is highly compatible with other relational databases, so dev-prod parity won’t be a big issue.
+
+## ⚙️ Auto Configuration
+All we need for full database functionality is to add two dependencies. Showing one of the most powerful features of Spring Boot: Auto Configuration.
+- Without Spring Boot, we’d have to configure Spring Data to speak to H2. 
+- However, because we’ve included the Spring Data dependency (and a specific data provider, H2), Spring Boot will automatically configure your application to communicate with H2.
+
+## 🔄 Spring Data’s CrudRepository
+This project uses a specific type of Repository: Spring Data’s CrudRepository.
+
+Complete implementation of all CRUD operations by extending CrudRepository:
+```java
+interface CashCardRepository extends CrudRepository<CashCard, Long> {
+}
+```
+With the above code, a caller can call any number of predefined CrudRepository methods, such as findById:
+```java
+cashCard = cashCardRepository.findById(99);
+```
+CrudRepository and everything it inherits from is an Interface with no actual code.
+- Based on the specific Spring Data framework used (here Spring Data JDBC) Spring Data takes care of this implementation for us during the IoC container startup time.
+- The Spring runtime will then expose the repository as yet another bean that you can reference wherever needed in your application.
+
+There are trade-offs. 
+- For example the CrudRepository generates SQL statements to read and write your data, which is useful for many cases, but sometimes you need to write your own custom SQL statements for specific use cases.
+---
+
+# 🚀 Implementing POST
+
+1. **Who specifies the ID** - the client, or the server?
+2. **In the API Request**, how do we represent the object to be created?
+3. **Which HTTP method should we use in the Request?**
+4. **What does the API send as a Response?**
+
+- “Who specifies the ID?” 
+  - In reality, this is up to the API creator! REST is not exactly a standard; it’s merely a way to use HTTP to perform data operations.
+
+The simplest solution is to let the server create the ID. Databases are efficient at managing unique IDs. Other alternatives include:
+
+- We could require the client to provide the ID. This might make sense if there were a pre-existing unique ID, but that’s not the case.
+- We could allow the client to provide the ID optionally (and create it on the server if the client does not supply it). The [Yagni article](https://martinfowler.com/bliki/Yagni.html) explains why this isn't a good idea.
+
+## 🔁 Idempotence and HTTP
+
+An idempotent operation is defined as one which, if performed more than once, results in the **same** outcome. 
+- In a REST API, an idempotent operation is one that even if it were to be performed several times, the resulting data on the server would be the same as if it had been performed only once.
+
+For each method, the HTTP standard specifies whether it is idempotent or not. 
+- GET, PUT, and DELETE are idempotent, whereas POST and PATCH are not.
+
+The server will create IDs for every Create operation, so the Create operation in this API is **NOT idempotent**. Since the server will create a new ID (on every Create request), if you call Create twice - even with the same content - you’ll end up with two different objects with the same content, but with different IDs. 
+- To summarize: **Every Create request will generate a new ID, thus no idempotency**.
+
+![](.README_images/f24148f8.png)
+REST permits POST as one of the proper methods to use for Create operations, the one used here.
+
+## 📤📥 The POST Request and Response
+
+### 📤The Request
+
+The POST method allows a Body, so we'll use the Body to send a JSON representation of the object:
+
+Request:
+- Method: POST
+- URI: /cashcards/
+- Body:
+```json
+{
+    "amount": 123.45
+}
+```
+- The GET operation includes the ID of the Cash Card in the URI, but not in the request Body.
+
+There no ID in the Request because we decided to allow the server to create the ID. Thus, the data contract for the Read operation is different from that of the Create operation.
+
+### 📥The Response
+
+On successful creation, the most accurate HTTP Response Status Code for REST APIs is: **201 CREATED**.
+- In this case, a response code of 200 OK does not answer the question “Was there any change to the server data?”. By returning the 201 CREATED status, the API is specifically communicating that data was added to the data store on the server.
+
+To recap, an HTTP Response contains two things: a Status Code, and a Body. But that’s not all. 
+- A Response also contains Headers. Headers have a name and a value. The HTTP standard specifies that the Location header in a 201 CREATED response should contain the URI of the created resource. 
+- This is handy because it allows the caller to easily fetch the new resource using the GET endpoint (the one we implemented prior).
+
+Response:
+- Status Code: 201 CREATED
+- Header: Location=/cashcards/42
+
+## 📡 Spring Web Convenience Methods
+
+In this project, we use the **ResponseEntity.created(uriOfCashCard)** method to create a response. 
+- This method requires you to specify the location, ensures the Location URI is well-formed (by using the URI class), adds the Location header, and sets the Status Code for you.
+- And by doing so, this saves us from using more verbose methods. For example, the following two code snippets are equivalent (as long as uriOfCashCard is not null):
+```java
+return  ResponseEntity
+        .created(uriOfCashCard)
+        .build();
+```
+Versus:
+```java
+return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .header(HttpHeaders.LOCATION, uriOfCashCard.toASCIIString())
+        .build();
 ```
