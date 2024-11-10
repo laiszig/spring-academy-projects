@@ -637,3 +637,82 @@ So, what does the `Page` object contain besides the Cash Cards? Here's the `Page
 ```
 
 Although we could return the entire Page object to the client, we don't need all that information. We'll define our data contract to only return the Cash Cards, not the rest of the Page data.
+
+---
+
+# 🔒 Simple Spring Security
+
+**Software Security** can mean many things, encompassing a wide range of topics. The focus here is on **Web Security**—specifically, how HTTP Authentication and Authorization work, common vulnerabilities in the web ecosystem, and how Spring Security can prevent unauthorized access to our service.
+
+### 🔑 **Authentication**
+
+- A user of an API can be a person or another program, so we often use the term **Principal** as a synonym for “user”.
+
+- **Authentication** is the act of a Principal proving its identity to the system, often by providing credentials (e.g., username and password using Basic Authentication).
+
+- Once credentials are verified, the Principal is **authenticated** (or “logged in”).
+
+- Since HTTP is a **stateless protocol**, each request must prove it’s from an authenticated Principal. Although credentials could be sent on each request, it’s inefficient. Instead, an **Authentication Session** is created once authenticated.
+
+    - Here we use a **Session Token**. A random string generated and placed in a Cookie, which is stored on the client.
+
+    - **Cookies**: A Cookie is a set of data stored in a web client (such as a browser), and associated with a specific URI.
+        - Are automatically sent to the server with every request. As long as the server checks that the Token in the Cookie is valid, unauthenticated requests can be rejected.
+        - Cookies can persist for a certain amount of time even if the web page is closed and later re-visited. This ability typically improves the user experience of the website.
+
+### 🛡️ **Spring Security and Authentication**
+
+Spring Security implements authentication in the Filter Chain. The Filter Chain is a component of Java web architecture which allows programmers to define a sequence of methods that get called prior to the Controller. 
+Each filter in the chain decides whether to allow request processing to continue, or not.
+
+- **Spring Security’s Filter**:
+    - Checks if a user’s request is authenticated.
+    - If not, it returns a `401 UNAUTHORIZED` response, stopping further request processing.
+
+### 📝 **Authorization**
+
+- After authentication, **Authorization** allows different users to have different permissions within the system.
+
+- **Spring Security Authorization**:
+    - Uses **Role-Based Access Control (RBAC)**.
+    - Each Principal has **Roles**, which determine access to specific resources or actions.
+    - For example, an **Administrator Role** might allow more actions than a **Card Owner Role**.
+    - Authorization can be configured both globally and per method.
+
+### 🔒 **Same Origin Policy**
+
+The web poses risks where malicious actors seek to exploit vulnerabilities. **Same Origin Policy (SOP)** provides basic protection by ensuring that only scripts within a web page can send requests to its origin URI.
+
+- **Why SOP Is Critical**: SOP prevents unauthorized scripts from sending requests to other sites. Without SOP, any web page could potentially send malicious requests to other sites where a user is authenticated.
+
+- **Example**: Imagine a user is logged into a bank account and then opens a malicious web page in a separate tab. If SOP weren’t enforced, that page could send harmful requests to the bank, potentially initiating actions like unauthorized withdrawals.
+
+## 🌍 **Cross-Origin Resource Sharing (CORS)**
+
+- When systems involve **multiple services running on different URIs** (like in microservices architecture), it’s necessary to allow controlled cross-origin requests.
+
+- **CORS** provides a way for browsers and servers to cooperate in relaxing SOP under controlled circumstances:
+    - Allows a server to specify **allowed origins** of requests.
+    - **Spring Security** supports CORS with the `@CrossOrigin` annotation, which specifies allowed sites.
+        - **Be cautious**: Using `@CrossOrigin` without specifying allowed origins will open up access to all origins!
+
+## 🔍 **Common Web Exploits**
+
+Along with exploiting known security vulnerabilities, malicious actors on the web are also constantly discovering new vulnerabilities. Spring Security provides a powerful tool set to guard against common security exploits. 
+
+### 🌊 **Cross-Site Request Forgery (CSRF)**
+
+- **CSRF (or "Sea-Surf")**, also known as Session Riding, attacks occur when a malicious script sends unauthorized requests to a server where the user is authenticated. These attacks exploit Cookies and Auth Tokens stored in the browser. When the server receives the Authentication Cookie, it has no way of knowing if the victim sent the harmful request unintentionally.
+- **CSRF Protection**: Use a **CSRF Token**, a unique token generated for each request. Unlike Auth Tokens, CSRF Tokens change with each interaction, making it difficult for attackers to predict and insert malicious requests.
+
+- **Spring Security CSRF Protection**: Enabled by default in Spring Security, CSRF Tokens safeguard against unauthorized requests, preventing outside actors from inserting malicious requests.
+
+### 📝 **Cross-Site Scripting (XSS)**
+
+- **XSS Attacks**: This occurs when an attacker is somehow able to “trick” the victim application into executing arbitrary code. For example, saving a string in a database containing a `<script>` tag  and then waiting until the string is rendered on a web page, resulting in the script being executed.
+
+- **XSS vs. CSRF**: XSS can be even more dangerous because:
+    - XSS enables the execution of arbitrary code (not limited to the user’s permissions).
+    - It does not rely on authentication but instead exploits poor security practices.
+
+- **XSS Prevention**: Securely handle and sanitize all data from external sources, including form inputs and query strings. Escaping special characters (e.g., HTML `<script>` tags) can prevent scripts from executing.
