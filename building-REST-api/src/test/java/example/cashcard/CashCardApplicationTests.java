@@ -3,13 +3,19 @@ package example.cashcard;
 import com.laiszig.buildingrestapi.BuildingRestApiApplication;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.laiszig.buildingrestapi.cashcard.CashCard;
+import com.laiszig.buildingrestapi.cashcard.CashCardRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
+
+import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,5 +55,33 @@ public class CashCardApplicationTests {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isBlank();
+    }
+
+    @Test
+    void shouldCreateANewCashCard() {
+        CashCard newCashCard = new CashCard(44L, 250.00);
+        // We don't provide an id because the db will create and manage it.
+        ResponseEntity<Void> createResponse = restTemplate.postForEntity("/cashcards", newCashCard, Void.class);
+        // We don't expect a CashCard to be returned, so Void response body.
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        // The origin server SHOULD send a 201 (Created) response
+
+        URI locationOfNewCashCard = createResponse.getHeaders().getLocation();
+        // the response should contain a Location header field that provides an identifier for the primary resource created
+        ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewCashCard, String.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        /* When a POST request results in the successful creation of a resource, such as a new CashCard,
+        the response should include information for how to retrieve that resource.
+        A URI in a Response Header named "Location"
+         */
+
+        // Add assertions such as these
+        DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+        Number id = documentContext.read("$.id");
+        Double amount = documentContext.read("$.amount");
+
+        assertThat(id).isNotNull();
+        assertThat(amount).isEqualTo(250.00);
+
     }
 }
