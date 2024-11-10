@@ -2,8 +2,6 @@
 
 Spring and Spring Boot are Java frameworks that help developers build applications in an efficient and scalable way. Think of them as toolkits for organizing and structuring code.
 
----
-
 ## 🌼 Spring
 
 Spring is a **comprehensive framework** that offers a variety of modules to support different types of applications.
@@ -15,8 +13,6 @@ For this project **Cash Card API**, we use:
 
 > ⚠️ Spring's versatility can make setup a bit complex. Developers often need to configure different components manually to get everything running.
 
----
-
 ## 🚀 Spring Boot
 
 Spring Boot simplifies the Spring experience! 🧰 It like an **opinionated version of Spring**—it comes with many pre-configured settings and dependencies commonly used in Spring apps. This makes it super easy to get started without manual setup.
@@ -26,8 +22,6 @@ Spring Boot includes an **embedded web server**— we don’t need an external s
 ### Summary
 - **Spring:** Powerful, flexible but can be overwhelming.
 - **Spring Boot:** Streamlined, fast to set up, with many built-in features.
-
----
 
 ## 🔄 Spring's Inversion of Control Container
 
@@ -40,13 +34,12 @@ Spring Boot utilizes Spring Core’s **Inversion of Control (IoC) container**. T
 
 More about [Spring’s IoC Container](https://docs.spring.io/spring-framework/reference/core/beans.html) in the official docs.
 
----
-
 ## 🛍️ Spring Initializr
 
 When starting a new Spring Boot project, **Spring Initializr** is the way to go. It is where you configure what you need and select dependencies for the app.
 
 - Fill in project metadata, add dependencies, and generate a complete, ready-to-run **Spring Boot application**.
+
 ---
 
 # 🌐 API Contracts & JSON
@@ -104,6 +97,7 @@ Other popular data formats include YAML (Yet Another Markup Language) and XML (E
 For these reasons, JSON has largely superseded XML as the most widely used format for APIs used by Web apps, including REST APIs.
 
 ---
+
 # 🧪 Testing First
 
 ## What Is Test Driven Development (TDD)?
@@ -114,11 +108,10 @@ Typically, automated tests are written **after** the application feature code, b
 - TDD ensures we write only the **minimum code** necessary to meet the requirements.
 - Passing tests mean both working code and a safeguard against future regressions.
 
----
-
 ## 📐 The Testing Pyramid
 
 Different types of tests have unique roles and impact at various levels of the system. Balancing **speed**, **maintenance cost**, and **confidence** forms the “testing pyramid”:
+
 ![](.README_images/1507e6c4.png)
 1. **Unit Tests**:
     - **Scope**: Tests isolated “units” of the system.
@@ -134,8 +127,6 @@ Different types of tests have unique roles and impact at various levels of the s
     - **Scope**: Tests the entire system from the user’s perspective.
     - **Characteristics**: Slow, often fragile, but thorough.
     - **Purpose**: Validates that the system works as a whole.
-
----
 
 ## 🔄 The Red, Green, Refactor Loop
 
@@ -176,8 +167,6 @@ How can development teams **move fast and stay reliable**? By continuously **ref
 - **Status Code** (indicates success or failure)
 - **Body** (contains data if applicable)
 
----
-
 ## 🧰RESTful CRUD Operations with HTTP Methods 
 
 When building REST APIs, each CRUD operation has a designated **HTTP method** and **status code** response, as shown below:
@@ -203,8 +192,6 @@ When following **REST** conventions for **CREATE** or **UPDATE** operations, we 
 
 - For example, when creating a new **Cash Card**, the body might include an initial cash amount, and for **UPDATE**, the request body would specify the changes to the cash value.
 
----
-
 # 💳 Cash Card Example
 
 For a **READ** operation, the **URI (endpoint)** path format is `/cashcards/{id}`, where `{id}` is replaced by the actual **Cash Card ID** (without braces), and the **HTTP method** used is **GET**.
@@ -228,10 +215,10 @@ The response to a successful Read request has a body containing the JSON represe
    }
 }
 ```
+
 ---
 
 # 🌱 REST in Spring Boot
----
 
 # 📝 Spring Annotations and Component Scan
 
@@ -240,9 +227,7 @@ The response to a successful Read request has a body containing the JSON represe
 - One way is to use **Spring Annotations**. This directs **Spring** to create an instance of the class during **Component Scan** at application startup.
 - The Bean is then stored in **Spring's IoC container** and can be **injected** into any other code that requires it.
 
----
-
-# 🌐 Spring Web Controllers
+## 🌐 Spring Web Controllers
 
 In **Spring Web**, incoming **Requests** are managed by **Controllers**:
 ```java
@@ -254,10 +239,10 @@ class CashCardController {
 - The Bean is stored in Spring’s IoC container. From here, the bean can be injected into any code that requests it.
 
 Spring routes requests to the **Controller** based on incoming **API requests**, and routes each to the appropriate handler method.
-![](.README_images/2cd4bf87.png)
----
 
-# 🖥️ Creating a Read Request Handler Method
+![](.README_images/2cd4bf87.png)
+
+## 🖥️ Creating a Read Request Handler Method
 A Controller method can be designated a handler method, to be called when a request that the method knows how to handle (called a “matching request”) is received.
 ```java
 private CashCard findById(Long requestedId) {
@@ -271,9 +256,8 @@ To handle **Read** operations:
 private CashCard findById(Long requestedId) {
 }
 ```
----
 
-# 🔄 Mapping Request Parameters
+## 🔄 Mapping Request Parameters
 
 **Spring** must know how to retrieve the **requestedId** parameter value. This is done using the **@PathVariable** annotation. Because the parameter name matches `{requestedId}` in the **@GetMapping** URI path, Spring can correctly **assign** the value to **requestedId**.
 ```java
@@ -281,9 +265,8 @@ private CashCard findById(Long requestedId) {
 private CashCard findById(@PathVariable Long requestedId) {
 }
 ```
----
 
-# 📤 Returning the Response
+## 📤 Returning the Response
 
 REST specifies that the **Response** should contain:
 - A **Cash Card** in the **body**
@@ -309,7 +292,7 @@ class CashCardController {
 
 If we to return real data, from a database, Spring Data works with Spring Boot to make database integration simple.
 
-## 🏗 Controller-Repository Architecture
+## 🏗️ Controller-Repository Architecture
 
 The **Separation of Concerns** principle states that well-designed software should be modular, with each module having distinct and separate concerns from any other module.
 
@@ -322,6 +305,7 @@ A common architectural framework that divides these layers, typically by functio
   - There may be intermediate layers as well, as dictated by business needs. We don't need any additional layers, at least not yet!
 
 The Repository is the interface between the application and the database, and provides a common abstraction for any database, making it easier to switch to a different database when needed.
+
 ![](.README_images/cd1e29e4.png)
 
 Spring Data provides a collection of robust data management tools, including implementations of the Repository pattern.
@@ -332,8 +316,9 @@ In this project we use an **embedded, in-memory database**.
 - “Embedded” simply means that it’s a Java library, so it can be added to the project just like any other dependency.
 - “In-memory” means that it stores data in memory only, as opposed to persisting data in permanent, durable storage. 
 - At the same time, our in-memory database is largely compatible with production-grade relational database management systems (RDBMS) like MySQL, SQL Server, and many others. Specifically, it uses JDBC (the standard Java library for database connectivity) and SQL (the standard database query language).
+
 ![](.README_images/b555a3ab.png)
-- 
+
 ### 🔄 In Memory Embedded vs External Database
 
 There are tradeoffs to using an in-memory database instead of a persistent database. 
@@ -365,6 +350,7 @@ CrudRepository and everything it inherits from is an Interface with no actual co
 
 There are trade-offs. 
 - For example the CrudRepository generates SQL statements to read and write your data, which is useful for many cases, but sometimes you need to write your own custom SQL statements for specific use cases.
+
 ---
 
 # 🚀 Implementing POST
@@ -394,6 +380,7 @@ The server will create IDs for every Create operation, so the Create operation i
 - To summarize: **Every Create request will generate a new ID, thus no idempotency**.
 
 ![](.README_images/f24148f8.png)
+
 REST permits POST as one of the proper methods to use for Create operations, the one used here.
 
 ## 📤📥 The POST Request and Response
@@ -430,7 +417,7 @@ Response:
 
 ## 📡 Spring Web Convenience Methods
 
-In this project, we use the **ResponseEntity.created(uriOfCashCard)** method to create a response. 
+In this project, we use the `ResponseEntity.created(uriOfCashCard)` method to create a response. 
 - This method requires you to specify the location, ensures the Location URI is well-formed (by using the URI class), adds the Location header, and sets the Status Code for you.
 - And by doing so, this saves us from using more verbose methods. For example, the following two code snippets are equivalent (as long as uriOfCashCard is not null):
 ```java
@@ -445,3 +432,208 @@ return ResponseEntity
         .header(HttpHeaders.LOCATION, uriOfCashCard.toASCIIString())
         .build();
 ```
+
+---
+
+# 📜 Returning a List with GET
+
+## 🔄 Requesting a List of Cash Cards
+
+This **API** should be able to return multiple **Cash Cards** in response to a single **REST request**.
+
+## 📑 The Data Contract
+
+When you make an **API request** for several **Cash Cards**, you’d ideally make a single request that returns a list of **Cash Cards**. We need a new **data contract**.
+- Instead of a single **Cash Card**, the new contract should specify that the response is a **JSON Array** of **Cash Card objects**.
+
+Example response:
+```json
+[
+    {
+        "id": 1,
+        "amount": 123.45
+    },
+    {
+        "id": 2,
+        "amount": 50.0
+    }
+]
+```
+
+---
+
+**CrudRepository**, has a **findAll** method that can be used to easily fetch all the **Cash Cards** in the database.
+```java
+@GetMapping()
+private ResponseEntity<Iterable<CashCard>> findAll() {
+   return ResponseEntity.ok(cashCardRepository.findAll());
+}
+```
+
+---
+
+🤔 However, it turns out there’s a lot more to this operation than just returning all the **Cash Cards** in the database.
+- **How do I return only the Cash Cards that the user owns?**.
+- **What if there are hundreds (or thousands?!) of Cash Cards?** Should the API return an unlimited number of results or return them in “chunks”?
+- **Should the Cash Cards be returned in a particular order (i.e., should they be sorted)?**
+
+## 📄 Pagination and Sorting
+
+We use a specialized version of the `CrudRepository`, called the `PagingAndSortingRepository`.
+
+- **Paging** functionality.
+  - Ideally, an API should not be able to produce a response with unlimited size, because this could overwhelm the client or server memory, not to mention taking quite a long time.
+  - To ensure that an API response doesn’t include an astronomically large number of Cash Cards, we utilize Spring Data’s pagination functionality. **Pagination** in Spring (and many other frameworks) specifies the page length (e.g., 10 items) and the page index (starting with 0). For example:
+      - If a user has 25 Cash Cards, and you elect to request the second page where each page has 10 items, you would request a page of size 10, and page index of 1.
+
+For pagination to produce the correct page content, the items must be sorted in some specific order. Why?
+
+- Imagine we have a bunch of Cash Cards with the following amounts:
+    - $0.19
+    - $1,000.00
+    - $50.00
+    - $20.00
+    - $10.00
+
+Here is an example using a page size of 3. Since there are 5 Cash Cards, we’d make two requests to return all of them. Page 1 (index 0) contains three items, and page 2 (index 1, the last page) contains 2 items.
+
+- If we specify that the items should be **sorted by amount in descending order**, then this is how the data is paginated:
+
+  **Page 1:**
+    - $1,000.00
+    - $50.00
+    - $20.00
+
+  **Page 2:**
+    - $10.00
+    - $0.19
+
+### ❓ Regarding Unordered Queries
+
+- Although Spring provides an “unordered” sorting strategy, let’s be explicit when we select which fields for sorting. Why?
+    - Imagine you elect to use “unordered” pagination. In reality, the order is not random but predictable; it never changes on subsequent requests.
+    - Let’s say you make a request, and Spring returns the following “unordered” results:
+
+      **Page 1:**
+        - $0.19
+        - $1,000.00
+        - $50.00
+
+      **Page 2:**
+        - $20.00
+        - $10.00
+
+Although they look random, every time you make the request, the cards will come back in exactly this order, so each item is returned on exactly one page.
+
+- If we create a new Cash Card with an amount of $42.00. Which page will it be on? There’s no way to know other than making the request and seeing where the new Cash Card lands.
+
+- It's more useful to opt for ordering by a specific field. **There are a few good reasons to do so:**
+    - Minimize cognitive overhead: Other developers (not to mention users) will probably appreciate a thoughtful ordering.
+    - Minimize future errors: What happens when a new version of Spring, Java, or the database suddenly causes the “random” order to change overnight?
+
+### 🔍 Spring Data Pagination API
+
+Spring Data provides the `PageRequest` and `Sort` classes for pagination.
+
+```java
+Page<CashCard> page2 = cashCardRepository.findAll(
+    PageRequest.of(
+        1,  // page index for the second page - indexing starts at 0
+        10, // page size (the last page might have fewer items)
+        Sort.by(new Sort.Order(Sort.Direction.DESC, "amount"))));
+```
+
+## 📄 The Request and Response
+
+### **We use Spring Web to extract the data to feed the pagination functionality:**
+
+- **Pagination**: Spring can parse out the page and size parameters if you pass a `Pageable` object to a `PagingAndSortingRepository` `find...()` method.
+
+- **Sorting**: Spring can parse out the sort parameter, which consists of the field name and direction separated by a comma. ⚠️ **No space before or after the comma is allowed!** Again, this data is part of the `Pageable` object.
+
+### 🌐 The URI
+
+**Step-by-step for composing a URI for the new endpoint** (omitting the `https://domain` prefix).
+
+1. Get the second page
+```text
+/cashcards?page=1
+```
+2. ...where a page has length of 3
+```text
+/cashcards?page=1&size=3
+```
+3. ...sorted by the current Cash Card balance
+```text
+/cashcards?page=1&size=3&sort=amount
+```
+4. ...in descending order (highest balance first)
+```text
+/cashcards?page=1&size=3&sort=amount,desc
+```
+
+### 🖥️ The Java Code
+
+**Here’s the complete implementation of the Controller method for the new “get a page of Cash Cards” endpoint:**
+```java
+@GetMapping
+private ResponseEntity<List<CashCard>> findAll(Pageable pageable) {
+   Page<CashCard> page = cashCardRepository.findAll(
+           PageRequest.of(
+                   pageable.getPageNumber(),
+                   pageable.getPageSize(),
+                   pageable.getSortOr(Sort.by(Sort.Direction.DESC, "amount"))));
+   return ResponseEntity.ok(page.getContent());
+}
+```
+
+### 🔍 Detail analysis:
+
+- **First, let’s parse the needed values out of the query string:**
+    - `Pageable` allows Spring to parse out the page number and size query string parameters.
+      - **Note**: If the caller doesn’t provide the parameters, Spring provides defaults: `page=0`, `size=20`.
+    - We use `getSortOr()` so that even if the caller doesn’t supply the sort parameter, there is a default. Unlike the page and size parameters, for which it makes sense for Spring to supply a default, it wouldn’t make sense for Spring to arbitrarily pick a sort field and direction.
+    - We use the `page.getContent()` method to return the Cash Cards contained in the `Page` object to the caller.
+
+So, what does the `Page` object contain besides the Cash Cards? Here's the `Page` object in JSON format. The Cash Cards are contained in the `content`. The rest of the fields contain information about how this Page is related to other Pages in the query.
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "amount": 10.0
+    },
+    {
+      "id": 2,
+      "amount": 0.19
+    }
+  ],
+  "pageable": {
+    "sort": {
+      "empty": false,
+      "sorted": true,
+      "unsorted": false
+    },
+    "offset": 3,
+    "pageNumber": 1,
+    "pageSize": 3,
+    "paged": true,
+    "unpaged": false
+  },
+  "last": true,
+  "totalElements": 5,
+  "totalPages": 2,
+  "first": false,
+  "size": 3,
+  "number": 1,
+  "sort": {
+    "empty": false,
+    "sorted": true,
+    "unsorted": false
+  },
+  "numberOfElements": 2,
+  "empty": false
+}
+```
+
+Although we could return the entire Page object to the client, we don't need all that information. We'll define our data contract to only return the Cash Cards, not the rest of the Page data.
