@@ -1,6 +1,6 @@
 # 🌱 Spring Academy Learning Path 🚀
 
-Welcome to the **Spring Academy** repository! 🎉 This repo contains all the modules of the Spring Boot Academy Learning Path, designed to help you master Spring Boot step by step. Let’s dive in and start learning! 💻📚
+Welcome to the **Spring Academy** repository! This repo contains all the modules of the Spring Boot Academy Learning Path 💻📚
 
 ---
 
