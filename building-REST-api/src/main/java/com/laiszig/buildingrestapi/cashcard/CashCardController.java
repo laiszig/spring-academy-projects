@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController // Spring Component. Capable of handling HTTP requests.
 @RequestMapping("/cashcards") // Indicates which address requests must have to access this Controller.
@@ -24,9 +25,9 @@ class CashCardController {
     @GetMapping("/{requestedId}") // Handler method. Requests that match cashcards/{requestedID} will be handled by this method
     public ResponseEntity<CashCard> findById(@PathVariable Long requestedId) {
         //@PathVariable makes Spring Web aware of the requestedId supplied in the HTTP request and available for us to use in our handler method.
-        if (requestedId.equals(99L)) {
-            CashCard cashCard = new CashCard(99L, 123.45);
-            return ResponseEntity.ok(cashCard);
+        Optional<CashCard> cashCardOptional = cashCardRepository.findById(requestedId);
+        if (cashCardOptional.isPresent()) {
+            return ResponseEntity.ok(cashCardOptional.get());
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -64,3 +65,8 @@ class CashCardController {
     If any of the three required parameters are not passed to the application, then reasonable defaults will be provided.
     */
 }
+
+/*
+When we add the Spring Security dependency to our application, security is enabled by default.
+If we don't specify how authentication and authorization should be performed within our API, Spring Security completely locks down our API.
+ */

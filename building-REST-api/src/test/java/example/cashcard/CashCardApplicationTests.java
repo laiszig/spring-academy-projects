@@ -64,9 +64,8 @@ public class CashCardApplicationTests {
 
     @Test
     @DirtiesContext
-    @Disabled
     void shouldCreateANewCashCard() {
-        CashCard newCashCard = new CashCard(null, 250.00);
+        CashCard newCashCard = new CashCard(null, 250.00, "sarah1");
         // We don't provide an id because the db will create and manage it.
         ResponseEntity<Void> createResponse = restTemplate.postForEntity("/cashcards", newCashCard, Void.class);
         // We don't expect a CashCard to be returned, so Void response body.
