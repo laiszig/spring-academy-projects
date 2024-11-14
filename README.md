@@ -9,12 +9,12 @@ Welcome to the **Spring Academy** repository! This repo contains all the modules
 ### 📚 **COURSE 1: Building a REST API with Spring Boot**
 - [x] **MODULE 1**: Creating RESTful Endpoints 🌐
 - [x] **MODULE 2**: Developing a Secure App 🔒
-- [ ] **MODULE 3**: Rounding Out CRUD 🔄
+- [x] **MODULE 3**: Rounding Out CRUD 🔄
 
 ---
 
 ### 📚 **COURSE 2: Introduction to the Spring Professional Learning Path**
-- [ ] **MODULE 1**: Getting Started 🎯
+- [x] **MODULE 1**: Getting Started 🎯
 
 ---
 
