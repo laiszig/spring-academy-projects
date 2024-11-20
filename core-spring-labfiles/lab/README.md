@@ -163,3 +163,111 @@ public class AppConfig {
 ```
 - **@Configuration:** Tells Spring to treat this class as a configuration source.
 - **@Bean:** The method employee() returns an Employee object registered as a Spring Bean.
+
+---
+Module 2
+
+- Spring separate application configuration from application objects (beans)
+- Spring manages your application objects
+  - creating them in the correct dependency order (when a method requires another class/method through constructor arguments, factory method arguments, or properties)
+![](.README_images/cb0c0d72.png)
+  - ensuring they are fully initialized before use
+Order:
+![](.README_images/e1964f28.png)
+  - each bean is given a unique id/ name
+
+ApplicationConfig is used to define/create the other beans. And it is also a bean.
+Bean ID based if not defines, is based in the method name.
+How to acess a bean programmatically:: 
+![](.README_images/0e3abe51.png)
+
+---
+
+Creating a Spring Application Context
+- Spring application context represents Spring DI container
+- Spring beans are managed through the application context
+- Spring application context can be created in any environment, including
+  - Standalone application
+  - Web application
+  - JUnit test
+
+![](.README_images/d16a7cb7.png)
+
+
+---
+
+Creating an Application Context from Multiple Configurations
+- Your @Configuration class can get too big
+  - Instead, use multiple config. files combined with @Import
+  - Defines a single Application Context
+    - Beans sourced from multiple files
+![](.README_images/172b4c78.png)
+
+- Separation of Concerns Principle
+  - Keep related beans in the same @Configuration
+- Best Practice: separate "application" & "infrastructure"
+  - Infrastructure often changes between environments.
+  
+![](.README_images/d81b754d.png)
+![](.README_images/8364fea8.png)
+
+
+Java configuration with DI
+- Use @Autowired to inject a bean defined elsewhere
+
+- ![](.README_images/0d869449.png)
+
+Bean definitions: recepies to create components.
+- Default scope: Singleton
+- The component is initialized once, and cached in the application context.
+- if we try to call the same bean (with same id) multiple times, it's going to be the same instance.
+![](.README_images/78b1339e.png)
+Implications for Singleton Beans: 
+- Typical Spring application - backend web server
+  - Multiple requests in parallel
+    - Handled by multiple threads
+  - Implications: multiple threads accessing singleton beans at the same time
+- Handle multi-threading issues
+  - Use stateless or Immutable beans
+  - Use synchronized (harder)
+  - Use a different scope
+
+Bean scope : prototype
+  - New instance created every time bean is referenced
+
+![](.README_images/1c38ac48.png)
+
+Most commonly used scopes are:
+- singleton - Single instance is used
+- prototype - a new instance is created each time the bean is referenced
+- session - a new instance is created once per user session - web environment only
+- request - a new instance is created once per request - web environment only
+
+Other scopes:
+- Web socket scope
+- refresh scope
+- thread scope (defined but not registered by default)
+- Custom scopes (rarely)
+  - You define a factory for creating bean instances
+  - register to define a custom scope name
+
+![](.README_images/349961ee.png)
+
+While you will likely use Annotation-based Configuration (that you will see in the Component Scanning module),
+Java Configuration is the most flexible option that carries the spirit of Factory or Builder type patterns.
+You will see this recurring in Spring Boot Auto-configuration projects, as well as projects where you may want to create beans that you cannot annotate.
+Such examples include 3rd party code, or legacy code you are not allowed to modify.
+
+For best practices, a bean’s name should describe the service it provides.
+It should not describe implementation details.
+For this reason, a bean’s name often corresponds to its interface.
+
+Constructor injection: heavily used in modern Spring code.
+Constructor injection is favored over field injection:
+Easier to test.
+Safer than field injection, particularly when forcing immutability of injected members through final.
+Ability to decouple domain POJOs from Spring.
+
+@Configuration //The @Configuration tells Spring to treat this class as a set of configuration instructions to be used when the application is starting up.
+
+
