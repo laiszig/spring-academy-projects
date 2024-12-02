@@ -1,40 +1,14 @@
 package rewards;
 
+import config.RewardsConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import javax.sql.DataSource;
 
 /**
- * TODO-06: Study this configuration class used for testing
- * - It contains a @Bean method that returns DataSource.
- * - It also creates and populates in-memory HSQL database tables
- *   using two SQL scripts.
- * - Note that the two scripts are located under the
- *   'src/main/resources/rewards/testdb' directory of
- *   the '00-rewards-common' project
- * - Do not modify this method.
- *
- * TODO-07: Import your application configuration file (RewardsConfig)
- * - Now the test code should have access to all the beans defined in
- *   the RewardsConfig configuration class
- *
- * TODO-08: Create a new JUnit 5 test class
- * - Call it RewardNetworkTests
- * - Create it in the same package this configuration class is located.
- * - Ask for a setUp() method to be generated within your IDE.
- *
- * NOTE: The appendices at the bottom of the course Home Page includes
- * a section on creating JUnit tests in an IDE.
- *
- * TODO-09: Make sure the setUp() method in the RewardNetworkTests class is annotated with @BeforeEach.
- * - In the setUp() method, create an application context using
- *   this configuration class - use run(..) static method of
- *   the SpringApplication class
- * - Then get the 'rewardNetwork' bean from the application context
- *   and assign it to a private field for use later.
- *
  * TODO-10: We can test the setup by running an empty test.
  * - If your IDE automatically generated a @Test method, rename it
  *   testRewardForDining. Delete any code in the method body.
@@ -53,6 +27,8 @@ import javax.sql.DataSource;
  *
  */
 @Configuration
+@Import(value = RewardsConfig.class)
+// Spring will create it as a Spring bean and automatically call its constructor passing the DataSource created here
 public class TestInfrastructureConfig {
 
 	/**
@@ -61,6 +37,10 @@ public class TestInfrastructureConfig {
 	 */
 	@Bean
 	public DataSource dataSource() {
+		/* This references external files that contain SQL statements
+		These SQL scripts will be executed when the application starts.
+		Example of Fluent API builder pattern
+		 */
 		return (new EmbeddedDatabaseBuilder()) //
 				.addScript("classpath:rewards/testdb/schema.sql") //
 				.addScript("classpath:rewards/testdb/data.sql") //
